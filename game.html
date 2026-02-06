@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="./assets/img/pen-drawing-.jpg">
+<title> Drawing Game - Fun Sketch Pad</title>
+<meta name="description" content="Drawing Game: create art with a responsive canvas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+<style>
+  body { margin:0; background:#000000; color:#ffffff; font-family:'Inter',sans-serif; }
+  h1 { text-align:center; margin-top:20px; }
+  p { text-align:center; }
+  .toolbar {
+    text-align:center;
+    margin:20px auto;
+  }
+  .toolbar button, .toolbar input[type=color] {
+    margin:0 5px;
+    padding:8px 12px;
+    font-weight:600;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  canvas {
+    display:block;
+    background:#1b1f29;
+    margin:20px auto;
+    border:4px solid #222832;
+    cursor:crosshair;
+    touch-action:none;
+  }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="index.html" aria-label="Home"><img src="assets/img/pen-drawing-.jpg" alt=" Drawing Game icon"><span> Drawing Game</span></a>
+    <div class="menu" data-nav-menu>
+      <a href="index.html" style='opacity:1;font-weight:800'>Home</a>
+      <a href="game.html" >Play Game</a>
+      <a href="leaderboard.html" >Leaderboard</a>
+      <a href="about.html" >About</a>
+      <a href="blog.html" >Blog</a>
+      <a href="faq.html" >FAQ</a>
+      <a href="privacy.html" >Privacy</a>
+      <a href="terms.html" >Terms</a>
+    </div>
+    <div class="right"><a class="btn ghost" data-nav-toggle>Menu</a><a class="btn" href="game.html">Play</a></div>
+  </div>
+</nav>
+
+<h1> Drawing Game — Fun Sketch Pad</h1>
+<p>Choose a color and draw anything you like. Click “Clear” to start over!</p>
+
+<div class="toolbar">
+  <input type="color" id="colorPicker" value="#37ffcd">
+  <button id="clearBtn">Clear</button>
+  <button id="saveBtn">Save</button>
+</div>
+
+<canvas id="drawCanvas" width="600" height="400"></canvas>
+
+<script>
+(function(){
+  const canvas = document.getElementById('drawCanvas');
+  const ctx = canvas.getContext('2d');
+  const colorPicker = document.getElementById('colorPicker');
+  const clearBtn = document.getElementById('clearBtn');
+  const saveBtn = document.getElementById('saveBtn');
+
+  let drawing = false;
+  let currentColor = colorPicker.value;
+
+  function startDraw(e){
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(getX(e), getY(e));
+  }
+
+  function draw(e){
+    if(!drawing) return;
+    ctx.lineTo(getX(e), getY(e));
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
+  function endDraw(){
+    drawing = false;
+    ctx.closePath();
+  }
+
+  function getX(e){ return e.offsetX ?? e.touches?.[0].clientX - canvas.getBoundingClientRect().left; }
+  function getY(e){ return e.offsetY ?? e.touches?.[0].clientY - canvas.getBoundingClientRect().top; }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+
+  // Touch support
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e); });
+  canvas.addEventListener('touchend', endDraw);
+
+  colorPicker.addEventListener('change', () => {
+    currentColor = colorPicker.value;
+  });
+
+  clearBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'drawing.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+})();
+</script>
+</body>
+</html>
